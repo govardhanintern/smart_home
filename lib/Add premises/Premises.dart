@@ -23,27 +23,15 @@ class _PremisesState extends State<Premises> {
   void initState() {
     super.initState();
     SelectedRoom = widget.SelectedRoom;
-    print(SelectedRoom.toString());
-    print(SelectedRoom.length);
-    print(PremisesGet.details.length);
-    print(tName() + "+++++++++++++++++++++++++++++++");
-    print(tIcon() + "+++++++++++++++++++++++++++++++");
+    SelectedRoom.sort();
   }
 
-  String tName() {
-    String nameR = "";
-    for (int i = 0; i < SelectedRoom.length; i++) {
-      nameR = PremisesGet.details[i].roomName.toString();
-    }
-    return nameR;
+  String tName(int index) {
+    return PremisesGet.details[index].roomName.toString();
   }
 
-  String tIcon() {
-    String iconR = "";
-    for (int i = 0; i < SelectedRoom.length; i++) {
-      iconR = PremisesGet.details[i].roomImage.toString();
-    }
-    return iconR;
+  String tIcon(int index) {
+    return PremisesGet.details[index].roomImage.toString();
   }
 
   @override
@@ -97,7 +85,7 @@ class _PremisesState extends State<Premises> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Welcome John!",
+                        "Welcome Admin!",
                         style: TextStyle(
                             color: MyColors.white,
                             fontSize: 20,
@@ -121,9 +109,6 @@ class _PremisesState extends State<Premises> {
                 ),
               ),
               SizedBox(
-                height: 20,
-              ),
-              /*SizedBox(
                 height: 600,
                 child: ListView.separated(
                   scrollDirection: Axis.vertical,
@@ -133,9 +118,11 @@ class _PremisesState extends State<Premises> {
                     );
                   },
                   itemCount: SelectedRoom.length,
-                  itemBuilder: (_, i) => boxDesign(tIcon(), tName()),
+                  itemBuilder: (_, i) => boxDesign(
+                      tIcon(SelectedRoom.elementAt(i)),
+                      tName(SelectedRoom.elementAt(i))),
                 ),
-              ),*/
+              ),
             ],
           ),
         ),
@@ -190,8 +177,12 @@ class _PremisesState extends State<Premises> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AddDevices()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddDevices(
+                                  SelectedRoom: SelectedRoom,
+                                )));
                   },
                   child: Container(
                     child: IconButton(

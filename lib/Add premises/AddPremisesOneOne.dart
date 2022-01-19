@@ -14,6 +14,13 @@ class AddPremisesOneOne extends StatefulWidget {
 
 class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
   List<String> addRoomList = [
+    "assets/dlivingroom.png",
+    "assets/dbedrom.png",
+    "assets/dkitchen.png",
+    "assets/doffice.png",
+    "assets/dkidsroom.png"
+  ];
+  List<String> changeList = [
     "assets/livingroom.png",
     "assets/bedrom.png",
     "assets/kitchen.png",
@@ -21,6 +28,7 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
     "assets/kidsroom.png"
   ];
 
+  bool imgSel = false;
   TextEditingController roomName = TextEditingController();
   bool roomName_validate;
   String roomName_error;
@@ -68,12 +76,12 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
                         ),
                       ),
                       Flexible(
-                          flex: 1,
+                          flex: 2,
                           fit: FlexFit.tight,
                           child: Align(
                             alignment: Alignment.center,
                             child: Text(
-                              "Add Room",
+                              "Add Premises",
                               style:
                                   TextStyle(fontSize: 18, color: Colors.white),
                             ),
@@ -89,21 +97,17 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
                                 style: TextStyle(color: Colors.white),
                               ),
                               onTap: () {
+                                if (imgSel == false) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text("Please select Icon")));
+                                }
                                 if (validate() == 0) {
-                                  if (addRoomList[tapped].length==0) {
-                                    print("Select Icon");
-                                  } else {
-                                    print("Next");
-                                  }
-                                  /*  PremisesDetails obj = PremisesDetails(
-                                      addRoomList[tapped].toString(),
+                                  PremisesDetails obj = PremisesDetails(
+                                      changeList[tapped].toString(),
                                       roomName.text);
                                   PremisesGet.details.add(obj);
                                   Navigator.pop(context);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => AddPremises()));*/
                                 }
                               },
                             ),
@@ -120,7 +124,7 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
                   Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Enter Room’s Name",
+                        "Enter Premises Name",
                         style: TextStyle(
                             color: MyColors.secondColor,
                             fontWeight: FontWeight.bold),
@@ -149,7 +153,7 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
                             fontWeight: FontWeight.bold),
                       )),
                   SizedBox(
-                    height: 400,
+                    height: MediaQuery.of(context).size.height,
                     child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisSpacing: 5,
@@ -164,9 +168,11 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
                                   onTap: () {
                                     setState(() {
                                       tapped = index;
+                                      imgSel = true;
                                     });
                                   },
-                                  child: boxDesign(addRoomList[index], index)));
+                                  child: boxDesign(addRoomList[index],
+                                      changeList[index], index)));
                           // return Container(child: Text("hello"), color: MyColors.red,);
                         }),
                   )
@@ -196,7 +202,7 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
     return cnt;
   }
 
-  Widget boxDesign(String img, int val) {
+  Widget boxDesign(String img, String changeimg, int val) {
     return Container(
       height: 80,
       width: 80,
@@ -206,10 +212,10 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
       ),
       child: Center(
         child: Image.asset(
-          img,
-          height: 30,
-          width: 30,
-          color: tapped == val ? MyColors.mainColor : Colors.grey,
+          tapped == val ? changeimg : img,
+          height: 50,
+          width: 50,
+          //     color: tapped == val ? MyColors.mainColor : Colors.grey,
         ),
       ),
     );

@@ -37,7 +37,7 @@ class _LoginState extends State<Login> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.only(top: 120, left: 15, right: 15),
+          padding: EdgeInsets.only(top: 90, left: 15, right: 15),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -96,7 +96,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 SizedBox(
-                  height: 8,
+                  height: 15,
                 ),
                 Align(
                     alignment: Alignment.centerLeft,
@@ -110,7 +110,7 @@ class _LoginState extends State<Login> {
                       },
                       child: Text(
                         "Forget password",
-                        style: TextStyle(color: MyColors.secondColor),
+                        style: TextStyle(color: MyColors.mainColor),
                       ),
                     )),
                 SizedBox(
@@ -122,17 +122,24 @@ class _LoginState extends State<Login> {
                     child: ElevatedButton(
                         onPressed: () {
                           if (validate() == 0) {
-                            Navigator.pop(context);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Bottom()));
-                            // login();
+                            if (mobile.text.length < 10) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text("Enter valid Mobile Number")));
+                            } else {
+                              /* Navigator.pop(context);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Bottom()));*/
+                              login();
+                            }
                           }
                         },
                         child: Text("Login"))),
                 SizedBox(
-                  height: 80,
+                  height: 40,
                 ),
                 GestureDetector(
                   onTap: () {
@@ -152,7 +159,57 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                                 color: MyColors.mainColor, fontSize: 15)),
                       ])),
-                )
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 80,
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Image.asset(
+                        "assets/facebook.png",
+                        height: 20,
+                        width: 20,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      width: 80,
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Image.asset(
+                        "assets/instagram.png",
+                        height: 20,
+                        width: 20,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      width: 80,
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Image.asset(
+                        "assets/link.png",
+                        height: 20,
+                        width: 20,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -171,6 +228,8 @@ class _LoginState extends State<Login> {
       Navigator.pop(context);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Bottom()));
+   /*   ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Success")));*/
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Contact to Admin")));
@@ -210,6 +269,7 @@ class _LoginState extends State<Login> {
       TextEditingController controller, bool val, String error) {
     return TextField(
       maxLines: 1,
+      maxLength: 10,
       controller: controller,
       decoration: InputDecoration(
         errorText: val ? error : null,

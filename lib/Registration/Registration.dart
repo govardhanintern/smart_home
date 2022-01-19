@@ -33,35 +33,42 @@ class _RegistrationState extends State<Registration> {
       pass_validate,
       confirmPass_validate,
       mobile_validate,
-      email_validate,
-      address_validate,
       pincode_validate,
       uniqueID_validate,
       ssid_validate,
+      city_validate,
+      state_validate,
       wifiPass_validate;
 
   String name_error,
       pass_error,
       confirmPass_error,
       mobile_error,
-      email_error,
-      address_error,
       pincode_error,
       uniqueID_error,
       ssid_error,
+      city_error,
+      state_error,
       wifiPass_error;
 
   bool _passwordVisible = false;
   bool _CpasswordVisible = false;
 
+  bool validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(value)) ? false : true;
+  }
+
   @override
   void initState() {
     name_validate = pass_validate = confirmPass_validate = mobile_validate =
-        email_validate = address_validate = pincode_validate =
+        pincode_validate = city_validate = state_validate =
             uniqueID_validate = ssid_validate = wifiPass_validate = false;
-    name_error = pass_error = confirmPass_error = mobile_error = email_error =
-        address_error =
-            pincode_error = uniqueID_error = ssid_error = wifiPass_error = "";
+    name_error = pass_error = confirmPass_error = mobile_error = pincode_error =
+        city_error =
+            state_error = uniqueID_error = ssid_error = wifiPass_error = "";
     _passwordVisible = false;
     _CpasswordVisible = false;
     super.initState();
@@ -70,227 +77,289 @@ class _RegistrationState extends State<Registration> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(alignment: Alignment.center, children: [
-        SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.only(top: 80, left: 25, right: 25, bottom: 150),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Registration",
-                    style: TextStyle(
-                        color: MyColors.secondColor,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold),
-                  ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(top: 80, left: 25, right: 25, bottom: 40),
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Registration",
+                  style: TextStyle(
+                      color: MyColors.secondColor,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
-                  height: 50,
-                ),
-                headText("Username"),
-                SizedBox(
-                  height: 10,
-                ),
-                mainTextField(username, name_validate, name_error),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("Password"),
-                SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  keyboardType: TextInputType.text,
-                  obscureText: !_passwordVisible,
-                  controller: password,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    errorText: pass_validate ? pass_error : null,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _passwordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _passwordVisible = !_passwordVisible;
-                        });
-                      },
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              headText("Username"),
+              SizedBox(
+                height: 10,
+              ),
+              mainTextField(username, name_validate, name_error),
+              SizedBox(
+                height: 20,
+              ),
+              headText("Password"),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                keyboardType: TextInputType.text,
+                obscureText: !_passwordVisible,
+                controller: password,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  errorText: pass_validate ? pass_error : null,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _passwordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Theme.of(context).primaryColorDark,
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("Confirm Password"),
-                SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  keyboardType: TextInputType.text,
-                  obscureText: !_CpasswordVisible,
-                  controller: confirmPass,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    errorText: confirmPass_validate ? confirmPass_error : null,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _CpasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _CpasswordVisible = !_CpasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("Mobile No."),
-                SizedBox(
-                  height: 10,
-                ),
-                numberField(mobile, mobile_validate, mobile_error),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("Email"),
-                SizedBox(
-                  height: 10,
-                ),
-                mainTextField(email, email_validate, email_error),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("Address"),
-                SizedBox(
-                  height: 10,
-                ),
-                mainTextField(address, address_validate, address_error),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("Pincode"),
-                SizedBox(
-                  height: 10,
-                ),
-                numberField(pincode, pincode_validate, pincode_error),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
-                    Flexible(
-                      flex: 1,
-                      fit: FlexFit.tight,
-                      child: Column(
-                        children: [
-                          headText("City"),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextField(
-                            maxLines: 1,
-                            controller: city,
-                            decoration: InputDecoration(
-                              suffixIcon: Icon(Icons.keyboard_arrow_down),
-                              border: OutlineInputBorder(),
-                            ),
-                            keyboardType: TextInputType.text,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Flexible(
-                      flex: 1,
-                      fit: FlexFit.tight,
-                      child: Column(
-                        children: [
-                          headText("State"),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextField(
-                            maxLines: 1,
-                            controller: state,
-                            decoration: InputDecoration(
-                              suffixIcon: Icon(Icons.keyboard_arrow_down),
-                              border: OutlineInputBorder(),
-                            ),
-                            keyboardType: TextInputType.text,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("Unique ID"),
-                SizedBox(
-                  height: 10,
-                ),
-                mainTextField(uniqueID, uniqueID_validate, uniqueID_error),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("SSID"),
-                SizedBox(
-                  height: 10,
-                ),
-                numberField(ssid, ssid_validate, ssid_error),
-                SizedBox(
-                  height: 20,
-                ),
-                headText("WIFI Password"),
-                SizedBox(
-                  height: 10,
-                ),
-                mainTextField(wifiPass, wifiPass_validate, wifiPass_error)
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 20,
-          left: 100,
-          child: Center(
-            child: Container(
-                height: 45,
-                width: 140,
-                child: ElevatedButton(
                     onPressed: () {
-                      /* if (validate() == 0) {
-                        if (password.text == confirmPass.text) {
-                          signIn();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Password Don't Match")));
-                        }
-                      }*/
-                      Navigator.pop(context);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddPremises()));
+                      setState(() {
+                        _passwordVisible = !_passwordVisible;
+                      });
                     },
-                    child: Text("Sign In"))),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              headText("Confirm Password"),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                keyboardType: TextInputType.text,
+                obscureText: !_CpasswordVisible,
+                controller: confirmPass,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  errorText: confirmPass_validate ? confirmPass_error : null,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _CpasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Theme.of(context).primaryColorDark,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _CpasswordVisible = !_CpasswordVisible;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              headText("Mobile No."),
+              SizedBox(
+                height: 10,
+              ),
+              numberField(mobile, mobile_validate, mobile_error),
+              SizedBox(
+                height: 20,
+              ),
+              headText("Email"),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                maxLines: 1,
+                controller: email,
+                onChanged: (text) {
+                  setState(() {
+                    email = email;
+                  });
+                },
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    suffixIcon: email.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              setState(() {
+                                email.clear();
+                              });
+                            },
+                            icon: Icon(Icons.highlight_remove))),
+                keyboardType: TextInputType.text,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              headText("Address"),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                controller: address,
+                onChanged: (text) {
+                  setState(() {
+                    address = address;
+                  });
+                },
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    suffixIcon: address.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              setState(() {
+                                address.clear();
+                              });
+                            },
+                            icon: Icon(Icons.highlight_remove))),
+                keyboardType: TextInputType.text,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              headText("Pincode"),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                controller: pincode,
+                maxLines: 1,
+                maxLength: 6,
+                onChanged: (text) {
+                  setState(() {
+                    pincode = pincode;
+                  });
+                },
+                decoration: InputDecoration(
+                    errorText: pincode_validate ? pincode_error : null,
+                    border: OutlineInputBorder(),
+                    suffixIcon: pincode.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              setState(() {
+                                pincode.clear();
+                              });
+                            },
+                            icon: Icon(Icons.highlight_remove))),
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                children: [
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      children: [
+                        headText("City"),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        mainTextField(city, city_validate, city_error)
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      children: [
+                        headText("State"),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        mainTextField(state, state_validate, state_error),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              headText("Unique ID"),
+              SizedBox(
+                height: 10,
+              ),
+              mainTextField(uniqueID, uniqueID_validate, uniqueID_error),
+              SizedBox(
+                height: 20,
+              ),
+              headText("WIFI Name"),
+              SizedBox(
+                height: 10,
+              ),
+              mainTextField(ssid, ssid_validate, ssid_error),
+              SizedBox(
+                height: 20,
+              ),
+              headText("WIFI Password"),
+              SizedBox(
+                height: 10,
+              ),
+              mainTextField(wifiPass, wifiPass_validate, wifiPass_error),
+              SizedBox(
+                height: 20,
+              ),
+              Center(
+                child: Container(
+                    height: 45,
+                    width: 140,
+                    child: ElevatedButton(
+                        onPressed: () {
+                            /* if (validate() == 0) {
+                            if (password.text == confirmPass.text) {
+                              if (mobile.text.length < 10) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            "Please Enter valid Mobile Number")));
+                              } else {
+                                if (email.text.isEmpty) {
+                                  signIn();
+                                } else {
+                                  if (validateEmail(email.text)) {
+                                   signIn();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                "Please Enter valid Email")));
+                                  }
+                                }
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text("Password Don't Match")));
+                            }
+                          }*/
+
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AddPremises()));
+                        },
+                        child: Text("Sign In"))),
+              ),
+            ],
           ),
         ),
-      ]),
+      ),
     );
   }
 
@@ -312,6 +381,9 @@ class _RegistrationState extends State<Registration> {
     if (result.message == "ID Not Exist") {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Unique Id Don't Match")));
+    } else if (result.message == "Unique Id Already Assigned") {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Unique Id Already Assigned")));
     } else if (result.message == "success") {
       Navigator.pop(context);
       Navigator.push(
@@ -336,10 +408,23 @@ class _RegistrationState extends State<Registration> {
     return TextField(
       maxLines: 1,
       controller: controller,
+      onChanged: (text) {
+        setState(() {
+          controller = controller;
+        });
+      },
       decoration: InputDecoration(
-        errorText: val ? error : null,
-        border: OutlineInputBorder(),
-      ),
+          errorText: val ? error : null,
+          border: OutlineInputBorder(),
+          suffixIcon: controller.text.isEmpty
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    setState(() {
+                      controller.clear();
+                    });
+                  },
+                  icon: Icon(Icons.highlight_remove))),
       keyboardType: TextInputType.text,
     );
   }
@@ -349,10 +434,23 @@ class _RegistrationState extends State<Registration> {
       controller: controller,
       maxLines: 1,
       maxLength: 10,
+      onChanged: (text) {
+        setState(() {
+          controller = controller;
+        });
+      },
       decoration: InputDecoration(
-        errorText: val ? error : null,
-        border: OutlineInputBorder(),
-      ),
+          errorText: val ? error : null,
+          border: OutlineInputBorder(),
+          suffixIcon: controller.text.isEmpty
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    setState(() {
+                      controller.clear();
+                    });
+                  },
+                  icon: Icon(Icons.highlight_remove))),
       keyboardType: TextInputType.number,
     );
   }
@@ -407,30 +505,6 @@ class _RegistrationState extends State<Registration> {
         mobile_error = "";
       });
     }
-    if (email.text.isEmpty) {
-      setState(() {
-        email_validate = true;
-        email_error = "Enter Email";
-      });
-      cnt++;
-    } else {
-      setState(() {
-        email_validate = false;
-        email_error = "";
-      });
-    }
-    if (address.text.isEmpty) {
-      setState(() {
-        address_validate = true;
-        address_error = "Enter Address";
-      });
-      cnt++;
-    } else {
-      setState(() {
-        address_validate = false;
-        address_error = "";
-      });
-    }
     if (pincode.text.isEmpty) {
       setState(() {
         pincode_validate = true;
@@ -441,6 +515,30 @@ class _RegistrationState extends State<Registration> {
       setState(() {
         pincode_validate = false;
         pincode_error = "";
+      });
+    }
+    if (city.text.isEmpty) {
+      setState(() {
+        city_validate = true;
+        city_error = "Enter City";
+      });
+      cnt++;
+    } else {
+      setState(() {
+        city_validate = false;
+        city_error = "";
+      });
+    }
+    if (state.text.isEmpty) {
+      setState(() {
+        state_validate = true;
+        state_error = "Enter State";
+      });
+      cnt++;
+    } else {
+      setState(() {
+        state_validate = false;
+        state_error = "";
       });
     }
     if (uniqueID.text.isEmpty) {

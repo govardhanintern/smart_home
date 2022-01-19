@@ -42,7 +42,9 @@ class _BottomState extends State<Bottom> {
               color: MyColors.mainColor,
               child: Column(
                 children: <Widget>[
-                  SizedBox(height: 50,),
+                  SizedBox(
+                    height: 50,
+                  ),
                   Image.asset(
                     "assets/demo.png",
                     height: 80,

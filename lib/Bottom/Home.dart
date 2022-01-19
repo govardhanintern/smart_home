@@ -17,141 +17,162 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with TickerProviderStateMixin {
   TabController _tabController;
 
+  List<String> testTab = ["Living Room", "Bed Room", "Kitchen", "Office"];
+
   @override
   void initState() {
-    _tabController = new TabController(length: 4, vsync: this);
     super.initState();
+    _tabController = new TabController(length: testTab.length, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.only(top: 60, left: 15, right: 15),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: MyColors.mainColor),
-              height: 180,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  Row(
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: Container(
+                  padding: EdgeInsets.only(top: 60, left: 15, right: 15),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: MyColors.mainColor),
+                  height: 180,
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
                     children: [
-                      Flexible(
-                        flex: 1,
-                        fit: FlexFit.tight,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: IconButton(
-                              onPressed: () => null,
-                              icon: Icon(
-                                Icons.drag_handle_outlined,
-                                color: MyColors.white,
-                              )),
-                        ),
-                      ),
-                      Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Image.asset(
-                              "assets/demo.png",
-                              height: 30,
-                              width: 30,
+                      Row(
+                        children: [
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: IconButton(
+                                  onPressed: () => null,
+                                  icon: Icon(
+                                    Icons.drag_handle_outlined,
+                                    color: MyColors.white,
+                                  )),
                             ),
-                          ))
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Welcome John!",
-                      style: TextStyle(
-                          color: MyColors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 2,
-                        fit: FlexFit.tight,
-                        child: Text(
-                          "Good Morning",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: MyColors.white,
                           ),
-                        ),
+                          Flexible(
+                              flex: 1,
+                              fit: FlexFit.tight,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Image.asset(
+                                  "assets/demo.png",
+                                  height: 30,
+                                  width: 30,
+                                ),
+                              ))
+                        ],
                       ),
-                      Text(
-                        "32 c",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: MyColors.white,
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Welcome John!",
+                          style: TextStyle(
+                              color: MyColors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(
-                        width: 5,
+                        height: 8,
                       ),
-                      Text(
-                        "52%",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: MyColors.white,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              "Good Morning",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: MyColors.white,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "32 c",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: MyColors.white,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "52%",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: MyColors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-            TabBar(
-              indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(width: 2.0),
-                  insets: EdgeInsets.symmetric(horizontal: 30.0)),
-              isScrollable: true,
-              unselectedLabelColor: Colors.grey,
-              labelColor: MyColors.secondColor,
-              indicatorColor: MyColors.secondColor,
-              tabs: [
-                Tab(
-                  text: 'Living Room',
-                ),
-                Tab(
-                  text: 'Bed Room',
-                ),
-                Tab(
-                  text: 'Kitchen',
-                ),
-                Tab(
-                  text: 'Office',
-                ),
-              ],
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.tab,
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  LivingRoomTab(),
-                  BedRoomTab(),
-                  KitchenTab(),
-                  OfficeTab(),
-                ],
+              TabBar(
+                indicator: UnderlineTabIndicator(
+                    borderSide: BorderSide(width: 2.0),
+                    insets: EdgeInsets.symmetric(horizontal: 30.0)),
+                isScrollable: true,
+                unselectedLabelColor: Colors.grey,
+                labelColor: MyColors.secondColor,
+                indicatorColor: MyColors.secondColor,
+                tabs: List<Widget>.generate(testTab.length, (int index) {
+                  return new Tab(text: testTab[index]);
+                }),
                 controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
               ),
-            ),
-          ],
+              Flexible(
+                flex: 3,
+                fit: FlexFit.tight,
+                child: TabBarView(
+                  children: List<Widget>.generate(testTab.length, (int index) {
+                    return Column(
+                      children: [
+                        if (testTab[index] == "Living Room") ...[
+                          Container(
+                            height: 600,
+                            child: LivingRoomTab(),
+                          )
+                        ] else if (testTab[index] == "Bed Room") ...[
+                          Container(
+                            height: 600,
+                            child: BedRoomTab(),
+                          )
+                        ] else if (testTab[index] == "Kitchen") ...[
+                          Container(
+                            height: 600,
+                            child: KitchenTab(),
+                          )
+                        ]else...[
+                          Container(
+                            height: 600,
+                            child: OfficeTab(),
+                          )
+                        ],
+                      ],
+                    );
+                  }),
+                  controller: _tabController,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -226,88 +247,6 @@ class _LivingRoomTabState extends State<LivingRoomTab> {
               );
             }),
       ),
-      /* floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              builder: (context) {
-                return Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Add Premises",
-                          style: TextStyle(fontSize: 25),
-                        ),
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/lamp.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Lamp'),
-                        onTap: () {
-                          addItems("Main Light");
-                          addImage("assets/lamp.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/tv.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('TV'),
-                        onTap: () {
-                          addItems("TV");
-                          addImage("assets/tv.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/ac.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('AC'),
-                        onTap: () {
-                          addItems("AC");
-                          addImage("assets/ac.png");
-                          addExtra("34 c temperature");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/fan.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Fan'),
-                        onTap: () {
-                          addItems("Fan");
-                          addImage("assets/fan.png");
-                          addExtra("Speed");
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              });
-        },
-        label: Text('Add Premises'),
-        icon: Icon(Icons.add_circle),
-        backgroundColor: MyColors.mainColor,
-      ),*/
     );
   }
 
@@ -453,88 +392,6 @@ class _BedRoomTabState extends State<BedRoomTab> {
               );
             }),
       ),
-      /* floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              builder: (context) {
-                return Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Add Premises",
-                          style: TextStyle(fontSize: 25),
-                        ),
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/lamp.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Lamp'),
-                        onTap: () {
-                          addItems("Main Light");
-                          addImage("assets/lamp.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/tv.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('TV'),
-                        onTap: () {
-                          addItems("TV");
-                          addImage("assets/tv.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/ac.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('AC'),
-                        onTap: () {
-                          addItems("AC");
-                          addImage("assets/ac.png");
-                          addExtra("34 c temperature");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/fan.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Fan'),
-                        onTap: () {
-                          addItems("Fan");
-                          addImage("assets/fan.png");
-                          addExtra("Speed");
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              });
-        },
-        label: Text('Add Premises'),
-        icon: Icon(Icons.add_circle),
-        backgroundColor: MyColors.mainColor,
-      ),*/
     );
   }
 
@@ -682,88 +539,6 @@ class _KitchenTabState extends State<KitchenTab> {
               );
             }),
       ),
-      /* floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              builder: (context) {
-                return Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Add Premises",
-                          style: TextStyle(fontSize: 25),
-                        ),
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/lamp.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Lamp'),
-                        onTap: () {
-                          addItems("Main Light");
-                          addImage("assets/lamp.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/tv.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('TV'),
-                        onTap: () {
-                          addItems("TV");
-                          addImage("assets/tv.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/ac.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('AC'),
-                        onTap: () {
-                          addItems("AC");
-                          addImage("assets/ac.png");
-                          addExtra("34 c temperature");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/fan.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Fan'),
-                        onTap: () {
-                          addItems("Fan");
-                          addImage("assets/fan.png");
-                          addExtra("Speed");
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              });
-        },
-        label: Text('Add Premises'),
-        icon: Icon(Icons.add_circle),
-        backgroundColor: MyColors.mainColor,
-      ),*/
     );
   }
 
@@ -777,11 +552,12 @@ class _KitchenTabState extends State<KitchenTab> {
     } else if (name == "FAN") {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => MainPageFan()));
-    }else{
+    } else {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => MainPageLamp()));
     }
   }
+
   Widget boxDesign(String img, String title, int index, {String subTitle}) {
     return Stack(children: [
       Container(
@@ -910,90 +686,9 @@ class _OfficeTabState extends State<OfficeTab> {
               );
             }),
       ),
-      /* floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              builder: (context) {
-                return Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Add Premises",
-                          style: TextStyle(fontSize: 25),
-                        ),
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/lamp.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Lamp'),
-                        onTap: () {
-                          addItems("Main Light");
-                          addImage("assets/lamp.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/tv.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('TV'),
-                        onTap: () {
-                          addItems("TV");
-                          addImage("assets/tv.png");
-                          addExtra("");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/ac.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('AC'),
-                        onTap: () {
-                          addItems("AC");
-                          addImage("assets/ac.png");
-                          addExtra("34 c temperature");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: Image.asset(
-                          "assets/fan.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: new Text('Fan'),
-                        onTap: () {
-                          addItems("Fan");
-                          addImage("assets/fan.png");
-                          addExtra("Speed");
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              });
-        },
-        label: Text('Add Premises'),
-        icon: Icon(Icons.add_circle),
-        backgroundColor: MyColors.mainColor,
-      ),*/
     );
   }
+
   void getItemName(String name) {
     if (name == "TV") {
       Navigator.push(
@@ -1004,11 +699,12 @@ class _OfficeTabState extends State<OfficeTab> {
     } else if (name == "FAN") {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => MainPageFan()));
-    }else{
+    } else {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => MainPageLamp()));
     }
   }
+
   Widget boxDesign(String img, String title, int index, {String subTitle}) {
     return Stack(children: [
       Container(

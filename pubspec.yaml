@@ -30,6 +30,9 @@ dependencies:
   flutter:
     sdk: flutter
   http: any
+  firebase_core: ^1.7.0
+  firebase_auth: ^3.1.3
+  pin_code_fields:
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -95,6 +98,10 @@ flutter:
      - assets/volume_up.png
      - assets/fanon.png
      - assets/homevector.png
+     - assets/facebook.png
+     - assets/instagram.png
+     - assets/link.png
+     - assets/chanel.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

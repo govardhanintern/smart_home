@@ -56,12 +56,6 @@ class _ResetPasswordState extends State<ResetPassword> {
                           fontWeight: FontWeight.bold,
                           fontSize: 32),
                     )),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "An 4 digit code has been sent to +91-9999999999",
-                      style: TextStyle(color: MyColors.grey, fontSize: 14),
-                    )),
                 SizedBox(
                   height: 50,
                 ),

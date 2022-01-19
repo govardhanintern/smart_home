@@ -35,6 +35,7 @@ class _AddPremisesState extends State<AddPremises> {
         body: Stack(children: [
           SingleChildScrollView(
             child: Container(
+              height: MediaQuery.of(context).size.height,
               child: Column(
                 children: [
                   Container(
@@ -77,7 +78,7 @@ class _AddPremisesState extends State<AddPremises> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Welcome John!",
+                            "Welcome Admin!",
                             style: TextStyle(
                                 color: MyColors.white,
                                 fontSize: 20,
@@ -121,6 +122,7 @@ class _AddPremisesState extends State<AddPremises> {
                                     if (tapped.contains(index)) {
                                       setState(() {
                                         tapped.remove(index);
+                                        SelectedRoom.remove(index);
                                         if (tapped.length == 0) {
                                           _isVisible = false;
                                         }
@@ -129,10 +131,12 @@ class _AddPremisesState extends State<AddPremises> {
                                     } else {
                                       setState(() {
                                         tapped.add(index);
+                                        SelectedRoom.add(index);
                                         _isVisible = true;
                                         print("tapped Add");
                                       });
                                     }
+                                    print("Selected Rom $SelectedRoom");
                                   },
                                   child: boxDesign(
                                       PremisesGet.details[index].roomImage,
@@ -146,7 +150,7 @@ class _AddPremisesState extends State<AddPremises> {
             ),
           ),
           Positioned(
-            bottom: 18,
+            bottom: 15,
             left: 20,
             child: Visibility(
               visible: _isVisible,
@@ -155,10 +159,7 @@ class _AddPremisesState extends State<AddPremises> {
                   width: 140,
                   child: ElevatedButton(
                     onPressed: () {
-                      for (int i = 0; i < tapped.length; i++) {
-                        SelectedRoom.add(i);
-                      }
-                     // print(SelectedRoom.toString());
+                      // print(SelectedRoom.toString());
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -180,7 +181,7 @@ class _AddPremisesState extends State<AddPremises> {
         ]),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            Navigator.pop(context);
+            /* Navigator.pop(context);*/
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => AddPremisesOneOne()));
           },
