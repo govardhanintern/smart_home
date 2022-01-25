@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_home/Models/PremisesDetails.dart';
-import 'package:smart_home/Models/PremisesGet.dart';
-
+import 'package:smart_home/DBHelper/APIService.dart';
+import 'package:smart_home/DBHelper/Environment.dart';
+import 'package:smart_home/Models/FetchUserPre.dart';
 import 'package:smart_home/MyColors.dart';
-
 import 'AddPremisesOneOne.dart';
-import 'AddPremisesOneZero.dart';
-import 'Premises.dart';
+import 'SelectedPremises.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddPremises extends StatefulWidget {
   const AddPremises({Key key}) : super(key: key);
@@ -22,10 +21,15 @@ class _AddPremisesState extends State<AddPremises> {
   List<int> tapped = [];
   bool _isVisible = false;
   List<int> SelectedRoom = [];
+  SharedPreferences sharedPreferences;
+
+  List<UserPremisesData> userPreList = List();
+  bool isLoad = true;
 
   @override
   void initState() {
     super.initState();
+    start();
   }
 
   @override
@@ -101,50 +105,56 @@ class _AddPremisesState extends State<AddPremises> {
                       ],
                     ),
                   ),
-                  PremisesGet.details.isEmpty
+                  userPreList.isEmpty
                       ? Text("")
-                      : Container(
-                          padding: EdgeInsets.all(8),
-                          height: 600,
-                          child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisSpacing: 8,
-                                      mainAxisSpacing: 8,
-                                      crossAxisCount:
-                                          (orientation == Orientation.portrait)
+                      : isLoad
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : Container(
+                              padding: EdgeInsets.all(8),
+                              height: 600,
+                              child: GridView.builder(
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisSpacing: 8,
+                                          mainAxisSpacing: 8,
+                                          crossAxisCount: (orientation ==
+                                                  Orientation.portrait)
                                               ? 2
                                               : 2),
-                              itemCount: PremisesGet.details.length,
-                              itemBuilder: (BuildContext ctx, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (tapped.contains(index)) {
-                                      setState(() {
-                                        tapped.remove(index);
-                                        SelectedRoom.remove(index);
-                                        if (tapped.length == 0) {
-                                          _isVisible = false;
+                                  itemCount: userPreList.length,
+                                  itemBuilder: (BuildContext ctx, index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        if (tapped.contains(index)) {
+                                          setState(() {
+                                            tapped.remove(index);
+                                            SelectedRoom.remove(index);
+                                            if (tapped.length == 0) {
+                                              _isVisible = false;
+                                            }
+                                            print("tapped Remove");
+                                          });
+                                        } else {
+                                          setState(() {
+                                            tapped.add(index);
+                                            SelectedRoom.add(index);
+                                            _isVisible = true;
+                                            print("tapped Add");
+                                          });
                                         }
-                                        print("tapped Remove");
-                                      });
-                                    } else {
-                                      setState(() {
-                                        tapped.add(index);
-                                        SelectedRoom.add(index);
-                                        _isVisible = true;
-                                        print("tapped Add");
-                                      });
-                                    }
-                                    print("Selected Rom $SelectedRoom");
-                                  },
-                                  child: boxDesign(
-                                      PremisesGet.details[index].roomImage,
-                                      PremisesGet.details[index].roomName,
-                                      index),
-                                );
-                              }),
-                        ),
+                                        print("Selected Rom $SelectedRoom");
+                                      },
+                                      child: boxDesign(
+                                          userPreList[index].premises.eImage,
+                                          userPreList[index]
+                                              .userPremises
+                                              .premisesName,
+                                          index),
+                                    );
+                                  }),
+                            ),
                 ],
               ),
             ),
@@ -163,7 +173,7 @@ class _AddPremisesState extends State<AddPremises> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Premises(
+                              builder: (context) => SelectedPremises(
                                     SelectedRoom: SelectedRoom,
                                   )));
                     },
@@ -181,9 +191,13 @@ class _AddPremisesState extends State<AddPremises> {
         ]),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            /* Navigator.pop(context);*/
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => AddPremisesOneOne()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AddPremisesOneOne())).then((value) {
+              fetchUserPre();
+            });
+            // Navigator.pop(context);
           },
           label: Text('Add Premises'),
           icon: Icon(Icons.add_circle),
@@ -206,8 +220,8 @@ class _AddPremisesState extends State<AddPremises> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(
-              img,
+            Image.network(
+              Environment.imageUrl + img,
               height: 50,
               width: 50,
             ),
@@ -226,5 +240,26 @@ class _AddPremisesState extends State<AddPremises> {
         ),
       ]),
     );
+  }
+
+  Future<List<FetchUserPre>> fetchUserPre() async {
+    Map<String, dynamic> map = Map();
+    map["user_id"] = sharedPreferences.getString("UserId");
+
+    var result = await APIService().fetchUserPremises(map);
+    setState(() {
+      userPreList = result.data;
+      isLoad = false;
+    });
+  }
+
+  Future<void> getSp() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+  Future<void> start() async {
+    await getSp();
+    fetchUserPre();
+    print(sharedPreferences.getString("UserId"));
   }
 }

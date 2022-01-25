@@ -1,34 +1,33 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_home/Add%20premises/SelectedPremises.dart';
 import 'package:smart_home/DBHelper/APIService.dart';
 import 'package:smart_home/DBHelper/Environment.dart';
 import 'package:smart_home/Models/DeviceModel.dart';
 import 'package:smart_home/Models/PremisesDeviceModel.dart';
-import 'package:smart_home/Models/PremisesDeviceModel.dart';
-import 'package:smart_home/Models/PremisesDeviceModel.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../MyColors.dart';
 
-class AddChanel extends StatefulWidget {
+class UserChannel extends StatefulWidget {
   final String packageID;
   final String packageName;
+  final String UpId;
 
-  const AddChanel({Key key, this.packageID, this.packageName})
+  const UserChannel({Key key, this.packageID, this.packageName, this.UpId})
       : super(key: key);
 
   @override
-  _AddChanelState createState() => _AddChanelState();
+  _UserChannelState createState() => _UserChannelState();
 }
 
-class _AddChanelState extends State<AddChanel> {
+class _UserChannelState extends State<UserChannel> {
   String packageID;
   String packageName;
+  String UpId;
   List<Device> devices = [];
   bool isLoad = true;
   List<int> devicesID = [];
+  SharedPreferences sharedPreferences;
 
   List<Map<String, dynamic>> packagesID = [];
 
@@ -37,7 +36,8 @@ class _AddChanelState extends State<AddChanel> {
     super.initState();
     packageID = widget.packageID;
     packageName = widget.packageName;
-    fetchPackageDevices();
+    UpId = widget.UpId;
+    start();
   }
 
   @override
@@ -94,10 +94,7 @@ class _AddChanelState extends State<AddChanel> {
                                   child: Align(
                                     alignment: Alignment.centerRight,
                                     child: GestureDetector(
-                                      onTap: () {
-                                        print(devicesID);
-                                        Navigator.pop(context, devicesID);
-                                      },
+                                      onTap: () {},
                                       child: Text(
                                         "Save",
                                         style: TextStyle(color: Colors.white),
@@ -123,8 +120,8 @@ class _AddChanelState extends State<AddChanel> {
                                           : 2),
                           itemCount: devices.length,
                           itemBuilder: (BuildContext ctx, index) {
-                            return boxDesign(devices[index],
-                                devices[index].device.devices_id);
+                            return boxDesign(
+                                devices[index], devices[index].device.devices_id);
                           }),
                     ),
                   ],
@@ -193,14 +190,25 @@ class _AddChanelState extends State<AddChanel> {
     ]);
   }
 
-  Future<void> fetchPackageDevices() async {
+  Future<void> fetchPremisesDevice() async {
     Map<String, dynamic> map = Map();
     map["package_id"] = packageID;
-    PremisesDevice result = await APIService().fetchPackageDevices(map);
+    map["user_id"] = sharedPreferences.getString("UserId");
+    map["up_id"] = UpId;
+    PremisesDevice result = await APIService().fetchPremisesDevice(map);
     setState(() {
       devices = result.device;
       isLoad = false;
     });
     print(devices.length);
+  }
+
+  Future<void> getSp() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+  Future<void> start() async {
+    await getSp();
+    fetchPremisesDevice();
   }
 }

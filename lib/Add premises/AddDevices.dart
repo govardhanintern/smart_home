@@ -1,256 +1,342 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_home/Add%20premises/AddChanel.dart';
-import 'package:smart_home/Add%20premises/Premises.dart';
+import 'package:smart_home/Add%20premises/SelectedPremises.dart';
 import 'package:smart_home/Bottom/Bottom.dart';
+import 'package:smart_home/DBHelper/APIService.dart';
+import 'package:smart_home/DBHelper/Environment.dart';
+import 'package:smart_home/Models/DeviceModel.dart';
+import 'package:smart_home/Models/PackageModel.dart';
+import 'package:smart_home/Models/PremisesDeviceModel.dart';
 import 'package:smart_home/Models/PremisesGet.dart';
-
+import 'package:smart_home/Models/ResponseModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../MyColors.dart';
 
 class AddDevices extends StatefulWidget {
-  final List<int> SelectedRoom;
+  final String UPID;
+  final String premisesName;
 
-  const AddDevices({Key key, this.SelectedRoom}) : super(key: key);
+  const AddDevices({Key key, this.UPID, this.premisesName}) : super(key: key);
 
   @override
   _AddDevicesState createState() => _AddDevicesState();
 }
 
 class _AddDevicesState extends State<AddDevices> {
-  List<int> SelectedRoom;
+  String UPID;
+  String premisesName;
+  PremisesDevice premisesDevices;
+  List<Device> devices = [];
+  List<Package> packages = [];
+  bool isLoad = true;
+  List<int> devicesID = [];
+  List<Map<String, dynamic>> packagesID = [];
+  List packages_id = [];
+  SharedPreferences sharedPreferences;
 
   @override
   void initState() {
     super.initState();
-    SelectedRoom = widget.SelectedRoom;
-    SelectedRoom.sort();
-  }
+    UPID = widget.UPID;
+    premisesName = widget.premisesName;
 
-  bool lamp = false;
-  bool fan = false;
-  bool ac = false;
-  bool tv = false;
-  bool music = false;
-
-  onChangeLamp(bool newvalue1) {
-    setState(() {
-      lamp = newvalue1;
-    });
-  }
-
-  onChangeFan(bool newvalue2) {
-    setState(() {
-      fan = newvalue2;
-    });
-  }
-
-  onChangeAc(bool newvalue3) {
-    setState(() {
-      ac = newvalue3;
-    });
-  }
-
-  onChangeTv(bool newvalue4) {
-    setState(() {
-      tv = newvalue4;
-    });
-  }
-
-  onChangeMusic(bool newvalue5) {
-    setState(() {
-      music = newvalue5;
-    });
+    start();
+    premisesDevices = new PremisesDevice(device: devices, package: packages);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.only(top: 60, left: 15, right: 15),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: MyColors.mainColor),
-            height: 110,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              children: [
-                Row(
+        body: isLoad
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Container(
+                child: Column(
                   children: [
                     Flexible(
-                      flex: 1,
-                      fit: FlexFit.tight,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.arrow_back_ios_outlined,
-                              color: MyColors.white,
-                            )),
+                      flex: 2,
+                      fit: FlexFit.loose,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 60, left: 15, right: 15),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: MyColors.mainColor),
+                        height: 110,
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  flex: 1,
+                                  fit: FlexFit.tight,
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: IconButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        icon: Icon(
+                                          Icons.arrow_back_ios_outlined,
+                                          color: MyColors.white,
+                                        )),
+                                  ),
+                                ),
+                                Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        premisesName,
+                                        style: TextStyle(
+                                            fontSize: 18, color: Colors.white),
+                                      ),
+                                    )),
+                                Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text(
+                                        "Next room",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    )),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Flexible(
-                        flex: 1,
-                        fit: FlexFit.tight,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Living Room",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        )),
+                      flex: 9,
+                      fit: FlexFit.tight,
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: ListView.separated(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              return SizedBox(
+                                height: 8,
+                              );
+                            },
+                            itemCount: premisesDevices.device.length +
+                                premisesDevices.package.length,
+                            itemBuilder: (_, i) {
+                              return i < premisesDevices.device.length
+                                  ? getDeviceDesign(premisesDevices.device[i])
+                                  : getChannelDesign(
+                                      premisesDevices.package[
+                                          premisesDevices.device.length +
+                                              premisesDevices.package.length -
+                                              i -
+                                              1],
+                                      i);
+                            }),
+                      ),
+                    ),
                     Flexible(
-                        flex: 1,
+                        flex: 3,
                         fit: FlexFit.tight,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "Next room",
-                            style: TextStyle(color: Colors.white),
+                        child: Container(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 50,
+                                margin: EdgeInsets.all(10),
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: MyColors.mBackColor),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0.0, horizontal: 0.0),
+                                  dense: true,
+                                  leading: Icon(Icons.device_hub_outlined),
+                                  title: Text(
+                                    "Connect New Device",
+                                    textScaleFactor: 1.3,
+                                  ),
+                                  trailing: Icon(
+                                    Icons.add_circle,
+                                    color: MyColors.mainColor,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                  height: 45,
+                                  width: 150,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        /*  Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Bottom()));*/
+
+                                        print(devicesID);
+                                        if (devicesID.isEmpty) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "Please Select Devices")));
+                                        } else {
+                                          insertUserDevices();
+                                        }
+                                      },
+                                      child: Text("Done"))),
+                            ],
                           ),
                         )),
                   ],
                 ),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(15),
-            child: Column(
-              children: [
-                /*boxDesign("assets/lamp.png", "Lamp", lamp, onChangeLamp),
-                SizedBox(
-                  height: 20,
-                ),
-                boxDesign("assets/fan.png", "Fan", fan, onChangeFan),
-                SizedBox(
-                  height: 20,
-                ),*/
-
-                boxDesign("assets/ac.png", "AC", ac, onChangeAc),
-                SizedBox(
-                  height: 20,
-                ),
-                boxDesign("assets/tv.png", "TV", tv, onChangeTv),
-                SizedBox(
-                  height: 20,
-                ),
-                boxDesign(
-                    "assets/music.png", "Music System", music, onChangeMusic),
-                SizedBox(
-                  height: 20,
-                ),
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => AddChanel()));
-                    },
-                    child: chanelBox("assets/chanel.png", "8 Chanel")),
-                SizedBox(
-                  height: 20,
-                ),
-                chanelBox("assets/chanel.png", "6 Chanel"),
-                SizedBox(
-                  height: 20,
-                ),
-                chanelBox("assets/chanel.png", "4 Chanel"),
-                SizedBox(
-                  height: 50,
-                ),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: MyColors.mBackColor),
-                  child: ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
-                    dense: true,
-                    leading: Icon(Icons.device_hub_outlined),
-                    title: Text(
-                      "Connect New Device",
-                      textScaleFactor: 1.3,
-                    ),
-                    trailing: Icon(
-                      Icons.add_circle,
-                      color: MyColors.mainColor,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                    height: 45,
-                    width: 150,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Bottom()));
-                        },
-                        child: Text("Done"))),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ));
+              ));
   }
 
-  Widget boxDesign(
-      String img, String title, bool val, Function onChangeMethod) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
-      dense: true,
-      leading: Image.asset(
-        img,
-        height: 25,
-        width: 25,
-      ),
-      title: Text(
-        title,
-        textScaleFactor: 1.3,
-      ),
-      trailing: Switch(
-        value: val,
-        onChanged: (newValue) {
-          onChangeMethod(newValue);
-        },
-        activeColor: MyColors.green,
-        inactiveTrackColor: Colors.grey,
-        inactiveThumbColor: Colors.white,
-      ),
-    );
-  }
-
-  Widget chanelBox(String img, String title) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
-      dense: true,
-      leading: Image.asset(
-        img,
-        height: 25,
-        width: 25,
-      ),
-      title: Text(
-        title,
-        textScaleFactor: 1.3,
-      ),
-      trailing: IconButton(
-          onPressed: () {
-            if (title == "8 Chanel") {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddChanel()));
-            }
+  Widget getDeviceDesign(Device device) {
+    return GestureDetector(
+      onTap: () {},
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
+        dense: true,
+        leading: Image.network(
+          Environment.imageUrl + device.device.devices_image,
+          height: 25,
+          width: 25,
+        ),
+        title: Text(
+          device.device.devices_name,
+          textScaleFactor: 1.3,
+        ),
+        trailing: Switch(
+          value: devicesID.contains(device.device.devices_id),
+          onChanged: (bool isOn) {
+            setState(() {
+              if (isOn)
+                devicesID.add(device.device.devices_id);
+              else
+                devicesID.remove(device.device.devices_id);
+            });
           },
-          icon: Icon(Icons.arrow_forward_ios)),
+          activeColor: MyColors.green,
+          inactiveTrackColor: Colors.grey,
+          inactiveThumbColor: Colors.white,
+        ),
+      ),
     );
+  }
+
+  Widget getChannelDesign(Package package, int index) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AddChanel(
+                      packageID: package.package_id.toString(),
+                      packageName: package.package_name,
+                    ))).then((value) {
+          List device_id = value;
+          setState(() {
+            for (int i = 0; i < packagesID.length; i++) {
+              if (packagesID[i]['package_id'] == package.package_id)
+                packagesID.removeAt(i);
+            }
+            if (device_id.length > 0)
+              packagesID
+                  .add({"package_id": package.package_id, "device_id": value});
+          });
+          print("packagesID");
+          print(packagesID);
+        });
+      },
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
+        dense: true,
+        leading: Image.network(
+          Environment.imageUrl + package.package_icon,
+          height: 25,
+          width: 25,
+        ),
+        title: Text(
+          package.package_name,
+          textScaleFactor: 1.3,
+        ),
+        trailing: IconButton(
+            onPressed: () {
+              /* if (package.package_name == "8 Chanel") {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AddChanel()));
+              }*/
+            },
+            icon: Icon(Icons.arrow_forward_ios)),
+      ),
+    );
+  }
+
+  Future<PremisesDevice> fetchPreDevices() async {
+    Map<String, dynamic> map = Map();
+    map["user_id"] = sharedPreferences.getString("UserId");
+    var result = await APIService().fetchDevices(map);
+    setState(() {
+      premisesDevices =
+          new PremisesDevice(device: result.device, package: result.package);
+      isLoad = false;
+    });
+  }
+
+  Future<ResponseModel> insertUserDevices() async {
+    setState(() {
+      packages_id = [];
+    });
+    for (int i = 0; i < packagesID.length; i++) {
+      print(packagesID[i].runtimeType);
+      setState(() {
+        // packages_id.add("'"+packagesID[i].toString()+"'");
+        packages_id.add("'" +
+            '{"package_id":' +
+            packagesID[i]['package_id'].toString() +
+            ', "device_id":' +
+            packagesID[i]['device_id'].toString() +
+            "}'");
+        // packages_id.add(packagesID[i].toString());
+      });
+    }
+    print("packages_id.toString()");
+    print(packages_id.toString());
+    Map<String, dynamic> map = Map();
+    map["user_id"] = sharedPreferences.getString("UserId");
+    map["up_id"] = UPID;
+    map["device_id"] = devicesID.toString();
+    // map["package_id"] = ['{"package_id": 4, "device_id": [8]}','{"package_id": 4, "device_id": [8]}'].toString();
+    map["package_id"] = packages_id.toString();
+
+    print("map");
+    print(map);
+
+    var result = await APIService().insertUserDevices(map);
+
+    if (result.message == "success") {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Success")));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error")));
+    }
+  }
+
+  Future<void> getSp() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+  Future<void> start() async {
+    await getSp();
+    fetchPreDevices();
   }
 }

@@ -9,6 +9,7 @@ import 'package:smart_home/Registration/Registration.dart';
 
 import '../MyColors.dart';
 import 'ForgetPassword.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({Key key}) : super(key: key);
@@ -23,13 +24,28 @@ class _LoginState extends State<Login> {
   bool _passwordVisible = false;
   bool mobile_validate, pass_validate;
   String mobile_error, pass_error;
+  SharedPreferences sharedPreferences;
 
   @override
   void initState() {
+    super.initState();
+    Status();
     mobile_validate = pass_validate = false;
     mobile_error = pass_error = "";
     _passwordVisible = false;
-    super.initState();
+  }
+
+  Future<bool> Path() async {
+    if (sharedPreferences.getString("status") == "loggedin") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (BuildContext context) => Bottom()),
+          (Route<dynamic> route) => false);
+    }
+  }
+
+  void Status() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    Path();
   }
 
   @override
@@ -228,7 +244,11 @@ class _LoginState extends State<Login> {
       Navigator.pop(context);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Bottom()));
-   /*   ScaffoldMessenger.of(context)
+      sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setString("UserId", result.userId.toString());
+      sharedPreferences.setString("UserName", result.user_name.toString());
+      sharedPreferences.setString("status", "loggedin");
+      /*   ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Success")));*/
     } else {
       ScaffoldMessenger.of(context)

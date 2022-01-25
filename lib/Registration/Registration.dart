@@ -2,11 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_home/Add%20premises/AddPremises.dart';
 import 'package:smart_home/Add%20premises/AddPremisesOneOne.dart';
-import 'package:smart_home/Add%20premises/Premises.dart';
+import 'package:smart_home/Add%20premises/SelectedPremises.dart';
 import 'package:smart_home/DBHelper/APIService.dart';
 import 'package:smart_home/Models/ResponseModel.dart';
 import 'package:smart_home/MyColors.dart';
 import 'package:smart_home/Registration/Login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Registration extends StatefulWidget {
   const Registration({Key key}) : super(key: key);
@@ -16,6 +17,8 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
+  SharedPreferences sharedPreferences;
+
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController confirmPass = TextEditingController();
@@ -320,7 +323,7 @@ class _RegistrationState extends State<Registration> {
                     width: 140,
                     child: ElevatedButton(
                         onPressed: () {
-                            /* if (validate() == 0) {
+                          /*    if (validate() == 0) {
                             if (password.text == confirmPass.text) {
                               if (mobile.text.length < 10) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -332,7 +335,7 @@ class _RegistrationState extends State<Registration> {
                                   signIn();
                                 } else {
                                   if (validateEmail(email.text)) {
-                                   signIn();
+                                    signIn();
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
@@ -347,14 +350,13 @@ class _RegistrationState extends State<Registration> {
                                       content: Text("Password Don't Match")));
                             }
                           }*/
-
                           Navigator.pop(context);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => AddPremises()));
                         },
-                        child: Text("Sign In"))),
+                        child: Text("Submit"))),
               ),
             ],
           ),
@@ -385,6 +387,9 @@ class _RegistrationState extends State<Registration> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Unique Id Already Assigned")));
     } else if (result.message == "success") {
+      sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setString("UserId", result.userId.toString());
+      // sharedPreferences.setString("status", "loggedin");
       Navigator.pop(context);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => AddPremises()));
@@ -556,7 +561,7 @@ class _RegistrationState extends State<Registration> {
     if (ssid.text.isEmpty) {
       setState(() {
         ssid_validate = true;
-        ssid_error = "Enter SSID";
+        ssid_error = "Enter WIFI Name";
       });
       cnt++;
     } else {
