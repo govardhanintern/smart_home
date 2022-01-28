@@ -11,45 +11,32 @@ import '../MyColors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddPremisesOneOne extends StatefulWidget {
-  const AddPremisesOneOne({Key key}) : super(key: key);
+  final String uID;
+
+  const AddPremisesOneOne({Key key, this.uID}) : super(key: key);
 
   @override
   _AddPremisesOneOneState createState() => _AddPremisesOneOneState();
 }
 
 class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
-  /*List<String> addRoomList = [
-    "assets/dlivingroom.png",
-    "assets/dbedrom.png",
-    "assets/dkitchen.png",
-    "assets/doffice.png",
-    "assets/dkidsroom.png"
-  ];
-  List<String> changeList = [
-    "assets/livingroom.png",
-    "assets/bedrom.png",
-    "assets/kitchen.png",
-    "assets/office.png",
-    "assets/kidsroom.png"
-  ];*/
-
   SharedPreferences sharedPreferences;
 
   List<PIconData> PIconList = List();
   bool isLoad = true;
-
+  String uID = "";
   bool imgSel = false;
   TextEditingController roomName = TextEditingController();
   bool roomName_validate;
   String roomName_error;
   int tapped;
-  String USERID = "";
 
   @override
   void initState() {
     super.initState();
     roomName_validate = false;
     roomName_error = "";
+    uID = widget.uID;
     start();
   }
 
@@ -262,7 +249,7 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
 
   Future<ResponseModel> insertUserPremises(String pi_id) async {
     Map<String, dynamic> map = Map();
-    map["user_id"] = USERID;
+    map["user_id"] = uID;
     map["pi_id"] = pi_id;
     map["premises_name"] = roomName.text;
 
@@ -291,7 +278,6 @@ class _AddPremisesOneOneState extends State<AddPremisesOneOne> {
   Future<void> start() async {
     await getSp();
     fetchPremises();
-    print(sharedPreferences.getString("UserId") + "ONE ONE");
-    USERID = sharedPreferences.getString("UserId");
+    print(sharedPreferences.getString("UserId") + " ONE ONE");
   }
 }

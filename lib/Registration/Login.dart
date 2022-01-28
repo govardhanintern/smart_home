@@ -5,6 +5,7 @@ import 'package:smart_home/Bottom/Bottom.dart';
 import 'package:smart_home/Bottom/Home.dart';
 import 'package:smart_home/DBHelper/APIService.dart';
 import 'package:smart_home/Models/ResponseModel.dart';
+import 'package:smart_home/Registration/RegisteredUser.dart';
 import 'package:smart_home/Registration/Registration.dart';
 
 import '../MyColors.dart';
@@ -46,6 +47,10 @@ class _LoginState extends State<Login> {
   void Status() async {
     sharedPreferences = await SharedPreferences.getInstance();
     Path();
+  }
+
+  void clearText() {
+    mobile.clear();
   }
 
   @override
@@ -157,13 +162,13 @@ class _LoginState extends State<Login> {
                 SizedBox(
                   height: 40,
                 ),
-                GestureDetector(
+                /* GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Registration()));
+                            builder: (context) => RegisteredUser()));
                   },
                   child: RichText(
                       text: TextSpan(
@@ -175,7 +180,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                                 color: MyColors.mainColor, fontSize: 15)),
                       ])),
-                ),
+                ),*/
                 SizedBox(
                   height: 20,
                 ),
@@ -240,19 +245,22 @@ class _LoginState extends State<Login> {
     map["user_password"] = password.text;
 
     var result = await APIService().login(map);
-    if (result.message == "success") {
+    if (result.message == "success" && result.user_status == "User") {
       Navigator.pop(context);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Bottom()));
       sharedPreferences = await SharedPreferences.getInstance();
       sharedPreferences.setString("UserId", result.userId.toString());
-      sharedPreferences.setString("UserName", result.user_name.toString());
       sharedPreferences.setString("status", "loggedin");
       /*   ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Success")));*/
+    } else if (result.message == "success" && result.user_status == "Admin") {
+      Navigator.pop(context);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => RegisteredUser()));
     } else {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Contact to Admin")));
+          .showSnackBar(SnackBar(content: Text("Invalid Credential")));
     }
   }
 
@@ -294,6 +302,8 @@ class _LoginState extends State<Login> {
       decoration: InputDecoration(
         errorText: val ? error : null,
         border: OutlineInputBorder(),
+        suffixIcon: IconButton(
+            onPressed: clearText, icon: Icon(Icons.highlight_remove)),
       ),
       keyboardType: TextInputType.number,
     );

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:smart_home/Models/DeviceModel.dart';
 import 'package:smart_home/Models/FetchTabsData.dart';
+import 'package:smart_home/Models/FetchUserDetails.dart';
+import 'package:smart_home/Models/FetchUserList.dart';
 import 'package:smart_home/Models/FetchUserPre.dart';
 import 'package:smart_home/Models/PIconModel.dart';
 import 'package:smart_home/Models/PackageModel.dart';
@@ -126,6 +128,39 @@ class APIService {
     print(result.body);
     var Data = jsonDecode(result.body);
     FetchTabsData model = FetchTabsData.fromJson(Data);
+    return model;
+  }
+
+  Future<ResponseModel> updateUserDeviceStatus(Map<String, dynamic> map) async {
+    String url = APIConstant.updateUserDeviceStatus;
+    var result = await http.post(Uri.parse(url), body: map);
+
+    print(result.body);
+    var Data = jsonDecode(result.body);
+    ResponseModel model = ResponseModel.fromJson(Data);
+    print(result.body);
+    return model;
+  }
+
+  Future<FetchUserList> fetchAllUsers() async {
+    String url = APIConstant.fetchAllUsers;
+    var result = await http.get(Uri.parse(url));
+
+    print(result.body);
+    var Data = jsonDecode(result.body);
+    FetchUserList model = FetchUserList.fromJson(Data);
+    print(result.body);
+    return model;
+  }
+
+  Future<FetchUserDetails> fetchUserDetails(Map<String, dynamic> map) async {
+    String url = APIConstant.fetchUserDetails;
+    var result = await http.post(Uri.parse(url), body: map);
+
+    print(result.body);
+    var Data = jsonDecode(result.body);
+    FetchUserDetails model = FetchUserDetails.fromJson(Data);
+    print(result.body);
     return model;
   }
 }

@@ -323,7 +323,7 @@ class _RegistrationState extends State<Registration> {
                     width: 140,
                     child: ElevatedButton(
                         onPressed: () {
-                          /*    if (validate() == 0) {
+                          if (validate() == 0) {
                             if (password.text == confirmPass.text) {
                               if (mobile.text.length < 10) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -349,12 +349,12 @@ class _RegistrationState extends State<Registration> {
                                   SnackBar(
                                       content: Text("Password Don't Match")));
                             }
-                          }*/
-                          Navigator.pop(context);
+                          }
+                          /*  Navigator.pop(context);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => AddPremises()));
+                                  builder: (context) => AddPremises()));*/
                         },
                         child: Text("Submit"))),
               ),
@@ -367,17 +367,18 @@ class _RegistrationState extends State<Registration> {
 
   Future<ResponseModel> signIn() async {
     Map<String, dynamic> map = Map();
-    map["user_name"] = username.text;
+    map["ud_name"] = username.text;
     map["user_mobile"] = mobile.text;
-    map["user_email"] = email.text;
-    map["user_address"] = address.text;
-    map["user_pincode"] = pincode.text;
+    map["ud_email"] = email.text;
+    map["ud_address"] = address.text;
+    map["ud_pincode"] = pincode.text;
     map["user_password"] = password.text;
     map["state"] = state.text;
     map["city"] = city.text;
     map["unique_id"] = uniqueID.text;
     map["ss_id"] = ssid.text;
     map["wifi_password"] = wifiPass.text;
+    map["user_status"] = "User";
 
     var result = await APIService().signUp(map);
     if (result.message == "ID Not Exist") {
@@ -386,16 +387,19 @@ class _RegistrationState extends State<Registration> {
     } else if (result.message == "Unique Id Already Assigned") {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Unique Id Already Assigned")));
+    } else if (result.message == "Mobile Already Exist") {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Mobile Already Exist")));
     } else if (result.message == "success") {
-      sharedPreferences = await SharedPreferences.getInstance();
-      sharedPreferences.setString("UserId", result.userId.toString());
-      // sharedPreferences.setString("status", "loggedin");
       Navigator.pop(context);
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => AddPremises()));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  AddPremises(uID: result.userId.toString())));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Contact to Admin")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Somthing Went Wrong Contact to Admin")));
     }
   }
 

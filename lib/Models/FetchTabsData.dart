@@ -4,6 +4,9 @@ import 'package:smart_home/Models/PackageModel.dart';
 
 import 'DeviceModel.dart';
 
+FetchTabsData fetchTabsDataFromJson(String str) => FetchTabsData.fromJson(json.decode(str));
+
+String fetchTabsDataToJson(FetchTabsData data) => json.encode(data.toJson());
 class FetchTabsData {
   FetchTabsData({
     this.data,

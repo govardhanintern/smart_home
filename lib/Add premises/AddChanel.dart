@@ -9,14 +9,17 @@ import 'package:smart_home/Models/DeviceModel.dart';
 import 'package:smart_home/Models/PremisesDeviceModel.dart';
 import 'package:smart_home/Models/PremisesDeviceModel.dart';
 import 'package:smart_home/Models/PremisesDeviceModel.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../MyColors.dart';
 
 class AddChanel extends StatefulWidget {
   final String packageID;
   final String packageName;
+  final String UPID;
+  final String uID;
 
-  const AddChanel({Key key, this.packageID, this.packageName})
+  const AddChanel(
+      {Key key, this.packageID, this.packageName, this.UPID, this.uID})
       : super(key: key);
 
   @override
@@ -26,10 +29,12 @@ class AddChanel extends StatefulWidget {
 class _AddChanelState extends State<AddChanel> {
   String packageID;
   String packageName;
+  String UPID;
+  String uID;
   List<Device> devices = [];
   bool isLoad = true;
   List<int> devicesID = [];
-
+  SharedPreferences sharedPreferences;
   List<Map<String, dynamic>> packagesID = [];
 
   @override
@@ -37,7 +42,9 @@ class _AddChanelState extends State<AddChanel> {
     super.initState();
     packageID = widget.packageID;
     packageName = widget.packageName;
-    fetchPackageDevices();
+    UPID = widget.UPID;
+    uID = widget.uID;
+    start();
   }
 
   @override
@@ -112,20 +119,22 @@ class _AddChanelState extends State<AddChanel> {
                     Container(
                       height: 600,
                       padding: EdgeInsets.all(10),
-                      child: GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisSpacing: 5,
-                                  mainAxisSpacing: 5,
-                                  crossAxisCount:
-                                      (orientation == Orientation.portrait)
-                                          ? 2
-                                          : 2),
-                          itemCount: devices.length,
-                          itemBuilder: (BuildContext ctx, index) {
-                            return boxDesign(devices[index],
-                                devices[index].device.devices_id);
-                          }),
+                      child: devices.isEmpty
+                          ? Center(child: Text("No Devices"))
+                          : GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisSpacing: 5,
+                                      mainAxisSpacing: 5,
+                                      crossAxisCount:
+                                          (orientation == Orientation.portrait)
+                                              ? 2
+                                              : 2),
+                              itemCount: devices.length,
+                              itemBuilder: (BuildContext ctx, index) {
+                                return boxDesign(devices[index],
+                                    devices[index].device.devices_id);
+                              }),
                     ),
                   ],
                 ),
@@ -195,12 +204,27 @@ class _AddChanelState extends State<AddChanel> {
 
   Future<void> fetchPackageDevices() async {
     Map<String, dynamic> map = Map();
+    map["user_id"] = uID;
+    map["up_id"] = UPID;
     map["package_id"] = packageID;
     PremisesDevice result = await APIService().fetchPackageDevices(map);
     setState(() {
       devices = result.device;
+      for (int i = 0; i < result.device.length; i++) {
+        if (result.device[i].status == 'Added')
+          devicesID.add(result.device[i].device.devices_id);
+      }
       isLoad = false;
     });
     print(devices.length);
+  }
+
+  Future<void> getSp() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+  Future<void> start() async {
+    await getSp();
+    fetchPackageDevices();
   }
 }

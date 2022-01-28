@@ -11,6 +11,7 @@ import 'package:smart_home/Models/DeviceModel.dart';
 import 'package:smart_home/Models/FetchTabsData.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_home/Models/PackageModel.dart';
+import 'package:smart_home/Models/ResponseModel.dart';
 import '../MyColors.dart';
 
 class Home extends StatefulWidget {
@@ -28,6 +29,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   List<TabsData> tabsList = [];
   bool isLoad = true;
+  List<int> devicesID = [];
 
   @override
   void initState() {
@@ -71,13 +73,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             List<Widget>.generate(tabsList.length, (int index) {
                           return SizedBox(
                               height: 400,
-                              child: LivingRoomTab(
-                                device: tabsList[index].device,
-                                package: tabsList[index].package,
-                                UpId: tabsList[index]
-                                    .userPremises
-                                    .upId
-                                    .toString(),
+                              child: deviceGride(
+                                tabsList[index].device,
+                                tabsList[index].package,
+                                tabsList[index].userPremises.upId.toString(),
                               ));
                         }),
                         controller: _tabController,
@@ -90,104 +89,28 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     );
   }
 
-  Future<FetchTabsData> tabsPremisesbyUser() async {
-    Map<String, dynamic> map = Map();
-    map["user_id"] = sharedPreferences.getString("UserId");
-
-    var result = await APIService().tabsPremisesbyUser(map);
-
-    setState(() {
-      tabsList = result.data;
-      _tabController = new TabController(length: tabsList.length, vsync: this);
-      isLoad = false;
-    });
-  }
-
-  Future<void> getSp() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-  }
-
-  Future<void> start() async {
-    await getSp();
-    tabsPremisesbyUser();
-  }
-}
-
-class LivingRoomTab extends StatefulWidget {
-  final List<Device> device;
-  final List<Package> package;
-  final String UpId;
-
-  const LivingRoomTab({Key key, this.device, this.package, this.UpId})
-      : super(key: key);
-
-  @override
-  _LivingRoomTabState createState() => _LivingRoomTabState();
-}
-
-class _LivingRoomTabState extends State<LivingRoomTab> {
-  List<String> extra = ["", "", "34 c temperature", "Speed"];
-  List<Device> device = [];
-  List<Package> package = [];
-  List<int> devicesID = [];
-  String UpId;
-
-  @override
-  void initState() {
-    super.initState();
-    device = widget.device;
-    package = widget.package;
-    UpId = widget.UpId;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget deviceGride(List<Device> device, List<Package> package, String UpId) {
     final orientation = MediaQuery.of(context).orientation;
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-        child: device.isEmpty
-            ? Center(child: Text("No Devices"))
-            : GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    crossAxisCount:
-                        (orientation == Orientation.portrait) ? 2 : 2),
-                itemCount: device.length + package.length,
-                itemBuilder: (BuildContext ctx, index) {
-                  return index < device.length
-                      ? tabsDeviceDesign(device[index],
-                          subTitle: extra.isEmpty ? Text("") : extra[index])
-                      : package.isEmpty
-                          ? tabsDeviceDesign(device[index],
-                              subTitle: extra.isEmpty ? Text("") : extra[index])
-                          : tabsPackageDesign(
-                              package[
-                                  device.length + package.length - index - 1],
-                              UpId);
-                }),
-      ),
-    );
+    return GridView.builder(
+        shrinkWrap: true,
+        primary: false,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisSpacing: 5,
+            mainAxisSpacing: 5,
+            crossAxisCount: (orientation == Orientation.portrait) ? 2 : 2),
+        itemCount: device.length + package.length,
+        itemBuilder: (BuildContext ctx, index) {
+          return index < device.length
+              ? tabsDeviceDesign(device[index].device, UpId)
+              : package.isEmpty
+                  ? tabsDeviceDesign(device[index].device, UpId)
+                  : tabsPackageDesign(
+                      package[device.length + package.length - index - 1],
+                      UpId);
+        });
   }
 
-  void getItemName(String name) {
-    if (name == "TV") {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainPageTV()));
-    } else if (name == "AC") {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainPageAC()));
-    } else if (name == "Fan") {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainPageFan()));
-    } else {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainPageLamp()));
-    }
-  }
-
-  Widget tabsDeviceDesign(Device device, {String subTitle}) {
+  Widget tabsDeviceDesign(DeviceDetails device, String UPID) {
     return Stack(children: [
       Container(
         padding: EdgeInsets.only(left: 10),
@@ -202,10 +125,10 @@ class _LivingRoomTabState extends State<LivingRoomTab> {
           children: [
             Container(
               child: Image.network(
-                Environment.imageUrl + device.device.devices_image,
+                Environment.imageUrl + device.devices_image,
                 width: 50,
                 height: 50,
-                color: devicesID.contains(device.device.devices_id)
+                color: devicesID.contains(device.devices_id)
                     ? MyColors.mainColor
                     : Colors.grey,
               ),
@@ -218,19 +141,15 @@ class _LivingRoomTabState extends State<LivingRoomTab> {
                 Column(
                   children: [
                     Text(
-                      device.device.devices_name,
+                      device.devices_name,
                       style: TextStyle(
-                        color: devicesID.contains(device.device.devices_id)
+                        color: devicesID.contains(device.devices_id)
                             ? MyColors.mainColor
                             : Colors.grey,
                       ),
                     ),
                     SizedBox(
                       height: 5,
-                    ),
-                    Text(
-                      subTitle,
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],
                 ),
@@ -242,13 +161,16 @@ class _LivingRoomTabState extends State<LivingRoomTab> {
       Positioned(
         right: 5,
         child: Switch(
-          value: devicesID.contains(device.device.devices_id),
+          value: devicesID.contains(device.devices_id),
           onChanged: (bool isOn) {
             setState(() {
-              if (isOn)
-                devicesID.add(device.device.devices_id);
-              else
-                devicesID.remove(device.device.devices_id);
+              if (isOn) {
+                devicesID.add(device.devices_id);
+                updateUserDeviceStatus(device.devices_id, UPID);
+              } else {
+                devicesID.remove(device.devices_id);
+                updateUserDeviceStatus(device.devices_id, UPID);
+              }
             });
           },
           activeColor: MyColors.green,
@@ -316,4 +238,50 @@ class _LivingRoomTabState extends State<LivingRoomTab> {
       ),
     );
   }
+
+  Future<ResponseModel> updateUserDeviceStatus(
+      int deviceId, String upid) async {
+    Map<String, dynamic> map = Map();
+    map["user_id"] = sharedPreferences.getString("UserId");
+    map["up_id"] = upid;
+    map["device_id"] = deviceId.toString();
+
+    print(map);
+
+    ResponseModel result = await APIService().updateUserDeviceStatus(map);
+    if (result.message == "success") {
+      /*ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Success")));*/
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error")));
+    }
+  }
+
+  Future<FetchTabsData> tabsPremisesbyUser() async {
+    Map<String, dynamic> map = Map();
+    map["user_id"] = sharedPreferences.getString("UserId");
+
+    FetchTabsData result = await APIService().tabsPremisesbyUser(map);
+
+    setState(() {
+      tabsList = result.data;
+      _tabController = new TabController(length: tabsList.length, vsync: this);
+      for (int i = 0; i < tabsList[i].device.length; i++) {
+        if (tabsList[i].device[i].status == 'ON')
+          devicesID.add(tabsList[i].device[i].device.devices_id);
+      }
+      isLoad = false;
+    });
+  }
+
+  Future<void> getSp() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+  Future<void> start() async {
+    await getSp();
+    tabsPremisesbyUser();
+  }
 }
+

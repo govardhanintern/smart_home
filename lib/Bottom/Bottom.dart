@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smart_home/Bottom/NotificationShow.dart';
+import 'package:smart_home/DBHelper/APIService.dart';
+import 'package:smart_home/Models/FetchUserDetails.dart';
+import 'package:smart_home/Models/FetchUserList.dart';
 import 'package:smart_home/Registration/Login.dart';
 import '../../MyColors.dart';
 import 'AddUser.dart';
@@ -277,6 +281,16 @@ class _BottomState extends State<Bottom> {
     );
   }
 
+  Future<void> fetchUserDetails() async {
+    Map<String, dynamic> map = Map();
+    map["user_id"] = sharedPreferences.getString("UserId");
+
+    FetchUserDetails result = await APIService().fetchUserDetails(map);
+    setState(() {
+      uName = result.userDetail.udName;
+    });
+  }
+
   void logout() {
     sharedPreferences.setString("status", "logout");
     sharedPreferences.setString("UserId", "");
@@ -288,6 +302,6 @@ class _BottomState extends State<Bottom> {
 
   void start() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    uName = sharedPreferences.getString("UserName");
+    fetchUserDetails();
   }
 }

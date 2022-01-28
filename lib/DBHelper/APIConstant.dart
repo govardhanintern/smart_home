@@ -12,4 +12,7 @@ class APIConstant {
   static String insertUserDevices = Environment.url + "insertUserDevices/";
   static String fetchPackageDevices = Environment.url + "fetchPackageDevices/";
   static String fetchPremisesDevice = Environment.url + "fetchPremisesDevice/";
+  static String updateUserDeviceStatus = Environment.url + "updateUserDeviceStatus/";
+  static String fetchAllUsers = Environment.url + "fetchAllUsers/";
+  static String fetchUserDetails = Environment.url + "fetchUserDetails/";
 }

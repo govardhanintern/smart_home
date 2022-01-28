@@ -12,8 +12,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectedPremises extends StatefulWidget {
   final List<int> SelectedRoom;
+  final String uID;
 
-  const SelectedPremises({Key key, this.SelectedRoom}) : super(key: key);
+  const SelectedPremises({Key key, this.SelectedRoom, this.uID})
+      : super(key: key);
 
   @override
   _SelectedPremisesState createState() => _SelectedPremisesState();
@@ -24,12 +26,14 @@ class _SelectedPremisesState extends State<SelectedPremises> {
   List<UserPremisesData> userPreList = List();
   bool isLoad = true;
   SharedPreferences sharedPreferences;
+  String uID;
 
   @override
   void initState() {
     super.initState();
     SelectedRoom = widget.SelectedRoom;
     SelectedRoom.sort();
+    uID = widget.uID;
     start();
   }
 
@@ -208,8 +212,9 @@ class _SelectedPremisesState extends State<SelectedPremises> {
                             builder: (context) => AddDevices(
                                   UPID: UPID,
                                   premisesName: title,
+                                  uID: uID,
                                 ))).then((value) {
-                                  fetchUserPre();
+                      fetchUserPre();
                     });
                   },
                   child: Container(
@@ -232,7 +237,7 @@ class _SelectedPremisesState extends State<SelectedPremises> {
 
   Future<List<FetchUserPre>> fetchUserPre() async {
     Map<String, dynamic> map = Map();
-    map["user_id"] = sharedPreferences.getString("UserId");
+    map["user_id"] = uID;
 
     var result = await APIService().fetchUserPremises(map);
     setState(() {
